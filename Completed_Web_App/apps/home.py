@@ -12,7 +12,7 @@ def app():
     st.write("""
      **Introduction**
 
-    For our final project, we decided to do an analysis and run machine learning models on Atlanta real estate data. The data we used was the Zillow Real Estate Data on Quandl.com. We ran API calls to pull all available Zillow real estate data for all metro Atlanta zip codes. We created an app where users can enter the listing price of a house, the number of bedrooms, and the county the house is located in, and it would determine and show the estimated monthly rental price of the house.
+    For our final project, we decided to do an analysis and run machine learning models on Atlanta real estate data. The data we used was the Zillow Real Estate Data on Quandl.com. We ran API calls to pull all available Zillow real estate data for all metro Atlanta zip codes. We created an app where users can enter the listing price of a house, the number of bedrooms, and the zip code the house is located in, and it would determine and show the estimated monthly rental price of the house.
     """)
 
     st.write("""
@@ -35,7 +35,7 @@ def app():
     st.write("""
     **Machine Learning Model**
 
-    For our project we decided to use Linear Regression because we wanted to make a useful tool for calculating possible rental income that took into account the initial cost of the property (in addition to location). Due to the linear relationship between purchase price and rent, we decided a Linear Regression would be an effective tool for predictions.
+    For our project we decided to use Linear Regression.
     """)
 
     st.write("""
