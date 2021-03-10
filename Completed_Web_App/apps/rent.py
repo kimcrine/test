@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn import datasets
-from sklearn.ensemble import RandomForestRegressor
 
 def app():
 
@@ -14,34 +12,10 @@ def app():
     ### Instructions: Use the sliders on the left to change the value of the features utilized by the model
     * ** List Price: ** The value of the house listing
     * ** Bedrooms: ** number of bedrooms in the house
-    * ** County: ** Use the numerical value associated to the county from the table below 
+    * ** County: ** Select county you would like to specify
     """)
- 
-
-    df = pd.DataFrame({"County Name": ["Fulton", "Gwinnett", "Dekalb", "Cobb", "Other"], "Filter Number": (1,2,3,4,5)})
-
-    # set first td and first th of every table to not display
-    st.markdown("""
-    <style>
-    table td:nth-child(1) {
-        display: none
-    }
-    table th:nth-child(1) {
-        display: none
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.table(df)
-
-    st.write("* Other consists of other counties in the Metro Atlanta Area *")
 
     st.write('---')
-
-    X = dummy_df[['List Price',
-        'Bedrooms','County']]
-
-    y = dummy_df['Rent'].values.reshape(-1,1)
 
     # Header of Specify Input Parameters
     st.sidebar.header('Specify Input Parameters')
@@ -49,8 +23,17 @@ def app():
     def user_input_features():
         list_price = st.sidebar.slider('List Price', 90000, 970000, 530000)
         bedrooms = st.sidebar.slider('Bedrooms', 1, 4, 2)
-        county1 = st.sidebar.slider('County', 1, 5, 3)
-        
+        county_name = st.sidebar.selectbox("Counties", ("Fulton", "Gwinnett", "Dekalb", "Cobb", "Other"))
+
+        def decode(county):
+            dictionary = {1: "Fulton", 2: "Gwinnett", 3: "Dekalb", 4: "Cobb", 5: "Other"}
+            county_str = ""
+            for key, value in dictionary.items():
+                if county == value:
+                    county_str = key
+            return county_str
+
+        county1 = decode(county_name)
         
         data = {'List Price': list_price,
                 'Bedrooms': bedrooms,
@@ -69,6 +52,12 @@ def app():
     # Main Panel
 
     # Build Regression Model
+
+    X = dummy_df[['List Price',
+        'Bedrooms','County']]
+
+    y = dummy_df['Rent'].values.reshape(-1,1)
+
     from sklearn.model_selection import train_test_split
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
@@ -92,5 +81,32 @@ def app():
     st.header('Prediction of Potential Monthly Rent')
     st.write(prediction)
     st.write('---')
+
+    if st.button("Click to see more information on the model"):
+        st.write("""We selected the **Linear Regression Model** because we wanted to make a useful tool for calculating possible rental income that took into account the initial cost of the property (in addition to location). Due to the linear relationship between purchase price and rent, we decided a Linear Regression would be an effective tool for predictions.""")
+        st.write("""The visualization below plots the difference between the model predicted values and actual y values, versus the model predicted values
+        """)
+        st.write('---')
+        predictions = model.predict(X_test_scaled)
+        model.fit(X_train_scaled, y_train_scaled)
+        fig = plt.figure()
+        plt.scatter(model.predict(X_train_scaled), model.predict(X_train_scaled) - y_train_scaled, c="blue", label="Training Data")
+        plt.scatter(model.predict(X_test_scaled), model.predict(X_test_scaled) - y_test_scaled, c="orange", label="Testing Data")
+        plt.legend()
+        plt.hlines(y=0, xmin=y_test_scaled.min(), xmax=y_test_scaled.max())
+        plt.title("Residual Plot")
+
+        st.pyplot(fig)
+
+
+        from sklearn.metrics import mean_squared_error
+
+        MSE = mean_squared_error(y_test_scaled, predictions)
+        r2 = model.score(X_test_scaled, y_test_scaled)
+
+        st.write("MSE:", round((MSE),2), "R2:", round((r2),2))
+
+
+
 
 
